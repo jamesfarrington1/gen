@@ -164,7 +164,7 @@ function setup() {
 
 
 
-            if (scores.attractor >= 3 && scores.repeller >= 2 && scores.wanderer >= 2) {
+            if (scores.attractor >= 2 && scores.repeller >= 2 && scores.wanderer >= 2) {
          
             image(teleporterImg, width-rectWidth/2, 280, particleDiameter, particleDiameter);
 
@@ -178,7 +178,7 @@ function setup() {
 
             //multiply
 
-            if (scores.attractor >= 3 && scores.repeller >=3 && scores.wanderer >= 2 && scores.teleporter >= 1) {
+            if (scores.attractor >= 2 && scores.repeller >=2 && scores.wanderer >= 2 && scores.teleporter >= 1) {
             //multiply
             image(multiplyImg, width-rectWidth/2, 340, particleDiameter, particleDiameter);
 
