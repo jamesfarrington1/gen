@@ -191,7 +191,7 @@ function setup() {
 
             //anchor
 
-            if (scores.attractor >= 4 && scores.repeller >= 3 && scores.wanderer >= 2 && scores.teleporter >= 1 && scores.multiply >= 1) {
+            if (scores.attractor >= 3 && scores.repeller >= 3 && scores.wanderer >= 2 && scores.teleporter >= 1 && scores.multiply >= 1) {
             image(anchorImg, width-rectWidth/2, 400, particleDiameter, particleDiameter);
 
             fill(80);
