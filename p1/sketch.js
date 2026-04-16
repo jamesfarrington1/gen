@@ -332,9 +332,10 @@ function setup() {
     //PARTICLE INTERACTIONS
     for (let j = 0; j < particles.length; j++) {
         let other = particles[j];
-             let otherRadius = particleRadius * pScale;
-             if (other.type === "anchor") {
-             otherRadius = particleRadius * 2 * pScale;
+        let otherScale = other.scale || 1;
+             let otherRadius = particleRadius * otherScale;
+             if (other.type === "anchor" || (other.type === "attractor" && other.isGiant)) {
+             otherRadius = particleRadius * 2 * otherScale;
 
              }
         if (i === j) {
@@ -544,7 +545,7 @@ function setup() {
             circle(p.x, p.y, auraSize2);
 
 
-            image(blackHoleImg, p.x, p.y, particleDiameter, particleDiameter);
+            image(blackHoleImg, p.x, p.y, particleDiameter * pScale, particleDiameter * pScale);
         } else if (p.type === "teleporter") {
             image(teleporterImg, p.x, p.y, particleDiameter * pScale, particleDiameter * pScale);
         } else if (p.type === "multiply") {
