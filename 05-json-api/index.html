@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Basic HTML Site</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Basic HTML Site</h1>
+    </header>
+    <main>
+        <p>This is a simple starting page.</p>
+        <div id="box" style="width:200px; height:200px;"></div>
+<p id="label"></p>
+    </main>
+    <footer>
+        <p>Created with HTML.</p>
+    </footer>
+
+    <script>
+        let color;
+
+async function loadData() {
+  const response = await fetch('./test.json');
+  color = await response.json();
+
+  const box = document.getElementById("box");
+  const label = document.getElementById("label");
+
+  box.style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
+  label.textContent = color.name;
+}
+
+loadData();
+    </script>
+</body>
+</html>

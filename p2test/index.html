@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Commons Gacha</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      background: #10100e;
+      color: #f4ead8;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      margin: 0;
+    }
+
+    .machine {
+      width: min(520px, 90vw);
+      background: #1f2118;
+      border: 2px solid #c97835;
+      border-radius: 24px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+
+    button {
+      background: #d96f32;
+      color: #fff7e8;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 360px;
+      border-radius: 16px;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .title {
+      font-size: 18px;
+      margin-top: 16px;
+      font-weight: bold;
+    }
+
+    .meta {
+      opacity: .75;
+      font-size: 13px;
+      margin-top: 8px;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="machine">
+    <h1>Commons Gacha</h1>
+    <button onclick="pullImage()">PULL FROM THE ARCHIVE</button>
+
+    <div id="result">
+      <p>Click to summon a random image from Wikimedia Commons.</p>
+    </div>
+  </div>
+
+  <script>
+    async function pullImage() {
+      const result = document.getElementById("result");
+      result.innerHTML = "<p>Rummaging through the archive...</p>";
+
+      try {
+        // STEP 1: Get one random file page from Commons
+        const randomURL =
+          "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query",
+            format: "json",
+            origin: "*",
+            list: "random",
+            rnnamespace: "6",
+            rnlimit: "1"
+          });
+
+        const randomResponse = await fetch(randomURL);
+        const randomData = await randomResponse.json();
+
+        const fileTitle = randomData.query.random[0].title;
+
+        // STEP 2: Get the usable image URL + metadata
+        const imageInfoURL =
+          "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query",
+            format: "json",
+            origin: "*",
+            titles: fileTitle,
+            prop: "imageinfo",
+            iiprop: "url|mime|size|extmetadata",
+            iiurlwidth: "800"
+          });
+
+        const imageResponse = await fetch(imageInfoURL);
+        const imageData = await imageResponse.json();
+
+        const page = Object.values(imageData.query.pages)[0];
+        const info = page.imageinfo[0];
+
+        // Some random files are videos, audio, PDFs, SVGs, etc.
+        // This filters for normal browser-friendly images.
+        if (!info.mime.startsWith("image/")) {
+          pullImage();
+          return;
+        }
+
+        const imageURL = info.thumburl || info.url;
+        const cleanTitle = fileTitle.replace("File:", "");
+
+        result.innerHTML = `
+          <img src="${imageURL}" alt="${cleanTitle}">
+          <div class="title">${cleanTitle}</div>
+          <div class="meta">
+            ${info.width} × ${info.height} px · ${info.mime}
+          </div>
+          <div class="meta">
+            <a href="${info.descriptionurl}" target="_blank" style="color:#f2b56b;">
+              View source on Wikimedia Commons
+            </a>
+          </div>
+        `;
+
+      } catch (error) {
+        console.error(error);
+        result.innerHTML = "<p>The archive jammed. Try again.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>

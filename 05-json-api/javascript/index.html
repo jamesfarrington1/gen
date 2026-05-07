@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather Demo with JavaScript</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 60px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    input {
+      width: 200px;
+    }
+
+    button {
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ddd;
+    }
+
+    .card {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255,255,255,0.1);
+      text-align: center;
+      min-width: 250px;
+    }
+  </style>
+</head>
+<body>
+  <input id="cityInput" placeholder="Enter city" />
+  <button onclick="getWeather()">Submit</button>
+  <div id="output" class="card"></div>
+  <script>
+    async function getWeather() {
+      let city = document.getElementById("cityInput").value;
+      // Get an API key from https://openweathermap.org/ and replace [YOUR_API_KEY] below
+      //let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=57013aaed930395260ded587eec1f5a9&units=imperial`;
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=1434b5cbdf383d0400571c957b7dd29d&units=imperial`;
+
+      try {
+        let res = await fetch(url);
+        let data = await res.json();
+
+        if (data.cod !== 200) {
+          document.getElementById("output").innerHTML = "City not found";
+          return;
+        }
+
+        let temp = data.main.temp;
+        let description = data.weather[0].description;
+        let size = 20 + temp * 2;
+
+        document.getElementById("output").innerHTML = `
+          <h2>${data.name}</h2>
+          <p style="font-size:${size}px">${temp.toFixed(1)}°F</p>
+          <p>${description}</p>
+        `;
+
+      } catch (err) {
+        document.getElementById("output").innerHTML = "Error loading data";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
