@@ -29,7 +29,7 @@ canvas {
 
     z-index: 0;
 
-filter: brightness(150%)
+filter: brightness(150%);
     opacity: 0.18;
 
     pointer-events: none;
