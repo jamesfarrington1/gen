@@ -1,3 +1,41 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#spaceBg {
+    position: fixed;
+    top: calc(50% + 90px);
+    left: 50%;
+
+    width: 220vw;
+    height: calc(123.75vw + 180px);
+
+    min-width: calc(177.77vh + 320px);
+    min-height: calc(100vh + 180px);
+
+    transform: translate(-50%, -50%);
+
+    border: none;
+
+    z-index: 0;
+
+filter: brightness(150%)
+    opacity: 0.18;
+
+    pointer-events: none;
+}
+
+
 #toolbar {
     position: absolute;
 
@@ -10,4 +48,62 @@
   justify-content: center;
 
   gap: 10px;
+  z-index: 10;
+}
+
+.flip-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 60px;
+    height: 60px;
+
+    position: absolute;
+    z-index: 1;
+}
+
+.add-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 120px;
+    height: 120px;
+
+    position: absolute;
+    z-index: 1;
+}
+
+.send-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 240px;
+    height: 120px;
+
+    position: absolute;
+    z-index: 1;
+}
+
+.receive-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 240px;
+    height: 120px;
+
+    position: absolute;
+    z-index: 1;
+}
+
+.receive-button:hover, 
+.add-button:hover,
+.flip-button:hover, 
+.send-button:hover {
+    transform: scale(1.15);
+    opacity: 0.8;
+    transition: all 0.2s;
 }

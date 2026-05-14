@@ -1,5 +1,3 @@
-
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
 import {
@@ -66,24 +64,35 @@ let flipped = false;
 let doodleLayer;
 let drawing = false;
 
+let fadeLevel = 180;
+
 let cardRotation = 0;
 let targetRotation = 0;
+
+let flipButton;
+let sendButton;
 
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  let button = createButton("New Postcard");
+  let addButton = createButton("");
+    addButton.html("<img src='img/addButton.png' width='120' height='120'>");
+    addButton.addClass("add-button");
 
-  button.mousePressed(getRandomImage);
+  addButton.mousePressed(getRandomImage);
 
   cardX = width / 2 - cardW / 2;
   cardY = height / 2 - cardH / 2;
 
+  addButton.position(cardX + 99, cardY - 116);
+
   doodleLayer = createGraphics(cardW, cardH);
   doodleLayer.background(255);
 
-  let flipButton = createButton("Flip Postcard");
+  flipButton = createButton("");
+  flipButton.html("<img src='img/flipArrow.png' width='120' height='120'>");
+  flipButton.addClass("flip-button");
     
     flipButton.mousePressed(() => {
         if (targetRotation === 0) {
@@ -93,18 +102,27 @@ function setup() {
             }
         } );
 
-    let sendButton = createButton("Send Postcard Into the Void");
-    
-    sendButton.mousePressed(sendPostcard);
+        flipButton.position(cardX - 40, cardY + cardH / 1.4- 30);
 
-    let receiveButton = createButton("Receive Postcard From the Void");
+    sendButton = createButton("");
+    sendButton.html("<img src='img/sendButton.png' width='300' height='120*1.02'>");
+    sendButton.addClass("send-button");
+
+    sendButton.mousePressed(sendPostcard);
+    
+    sendButton.position(cardX + cardW - 180, cardY + cardH / 1.4- 30);
+
+    let receiveButton = createButton("");
+    receiveButton.html("<img src='img/receiveButton.png' width='240' height='120'>");
+    receiveButton.addClass("receive-button");
 
     receiveButton.mousePressed(receivePostcard);
+    receiveButton.position(cardX + cardW - 320, cardY - 106);
 
 
 
 
-        button.parent("toolbar");
+        addButton.parent("toolbar");
         flipButton.parent("toolbar");
         sendButton.parent("toolbar");
         receiveButton.parent("toolbar");
@@ -139,7 +157,8 @@ async function getRandomImage() {
 
 function draw() {
 
-  background(220);
+  //background(220);
+  clear();
 
   fill(0);
 
@@ -152,6 +171,19 @@ function draw() {
   // image(postcardImage, cardX, cardY, cardW, cardH);
 
  // }
+
+ if (postcardImage) {
+    flipButton.show();
+    } else {
+    flipButton.hide();
+ }
+
+ if (postcardImage) {
+    sendButton.show();
+    } else {
+    sendButton.hide();
+ }
+
 
   cardRotation = lerp(cardRotation, targetRotation, 0.12);
 
@@ -171,47 +203,90 @@ scale(squeeze, 1);
 
 
         if (flipped && postcardImage) {
-            strokeWeight(6);
+            rectMode (CENTER);
+
             fill(255);
-            rect(-cardW / 2, -cardH / 2, cardW, cardH);
+            stroke(0);
+            strokeWeight(4);
+            rect(0, 0, cardW, cardH);
 
-            image(doodleLayer, -cardW / 2, -cardH / 2);
+            imageMode(CORNER);
+            image(doodleLayer, -cardW / 2, -cardH / 2, cardW, cardH);
 
+            noFill();
+            stroke(0);
+            strokeWeight(4);
+            rect(0, 0, cardW, cardH);
+
+            rectMode (CORNER);
            
 
 
             fill(0);
+            noStroke();
             textSize(10);
-            text("Draw your message here!", -cardW / 2 + 10, -cardH / 2 + 20);
+            text("Leave your mark. Or don't.", -cardW / 2 + 20, -cardH / 2 + 30);
 
             
         } else {
             
             if (postcardImage) {
-                image(postcardImage, -cardW / 2, -cardH / 2, cardW, cardH);
-                    noFill();
+
+                    //white border
+
+                    rectMode (CENTER);
+
                     stroke(0);
                     strokeWeight(4);
-                    rect(-cardW / 2, -cardH / 2, cardW, cardH);
 
+                    fill(255);
+                    rect (0, 0, cardW, cardH);
+
+                    rectMode (CORNER);
+
+
+
+                    //IMAGEEEEE
+
+
+
+                    let imageWidth = cardW/1.05;
+                    let imageHeight = cardH/1.08;
+                    let imageX = -imageWidth / 2;
+                    let imageY = -imageHeight / 2;
+
+                imageMode (CENTER);
+                
+                image(postcardImage, 0, 0, cardW/1.05, cardH/1.08);
+                    noFill();
+                    stroke(0);
+                    strokeWeight(1);
+
+                    rectMode (CENTER);
+                    rect(0, 0, cardW/1.05, cardH/1.08);
+
+                    rectMode (CORNER);
+
+
+
+                    //Text Boxxxxx
                     fill(0);
                 
-
-
                 textSize(10);
                 textWidth(postcardTitle);
                 let titleWidth = textWidth(postcardTitle);
 
-                if (titleWidth > cardW - 20) {
+                if (titleWidth > imageWidth - 20) {
                     textSize(8);
                 }
 
-                rect(-cardW / 2, -cardH / 2 + cardH - 20, titleWidth + 10, 20);
+                noStroke();
+                rect(imageX, imageY + imageHeight - 20, titleWidth + 10, 20);
 
                 
                 fill(255);
 
-                text(postcardTitle, -cardW / 2 + 5, -cardH / 2 + cardH -5);
+                text(postcardTitle, imageX + 5, imageY + imageHeight - 5);
                 }
             
                 
@@ -294,7 +369,12 @@ async function receivePostcard() {
 
             if (pickedPostcard.doodle) {
             loadImage(pickedPostcard.doodle, img => {
+                doodleLayer.push();
+                doodleLayer.tint(255, fadeLevel);
+
                 doodleLayer.image(img, 0, 0, cardW, cardH);
+
+                doodleLayer.pop();
             });
             }
 }
