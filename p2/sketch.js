@@ -309,7 +309,7 @@ scale(squeeze * cardScale, cardScale);
             fill(0);
             noStroke();
             textSize(10);
-            text("Leave your mark?s", -cardW / 2 + 20, -cardH / 2 + 30);
+            text("Leave your mark?", -cardW / 2 + 20, -cardH / 2 + 30);
 
             
         } else {
