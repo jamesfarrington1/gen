@@ -72,12 +72,31 @@ let targetRotation = 0;
 let flipButton;
 let sendButton;
 
+let cardAnim = "none";
+let cardAnimStart = 0;
+let cardAnimDuration = 650;
+let cardScale = 1;
+let cardOffsetY = 0;
+
+function startCardAnimation(type) {
+    cardAnim = type;
+    cardAnimStart = millis();
+}
+
+function easeOutCubic(t) {
+    return 1 - pow(1 - t, 3);
+}
+
+function easeInCubic(t) {
+    return t * t * t;
+}
+
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   let addButton = createButton("");
-    addButton.html("<img src='img/addButton.png' width='120' height='120'>");
+    addButton.html("<img src='img/addButton.png' width='220' height='120'>");
     addButton.addClass("add-button");
 
   addButton.mousePressed(getRandomImage);
@@ -85,7 +104,7 @@ function setup() {
   cardX = width / 2 - cardW / 2;
   cardY = height / 2 - cardH / 2;
 
-  addButton.position(cardX + 99, cardY - 116);
+  addButton.position(cardX + 99, cardY - 106);
 
   doodleLayer = createGraphics(cardW, cardH);
   doodleLayer.background(255);
@@ -147,6 +166,7 @@ async function getRandomImage() {
         postcardImage = img;
         currentPostcardId = null;
         cardRotation = 0;
+        startCardAnimation("pull");
 
         doodleLayer.background(255);
         flipped = false;
@@ -172,6 +192,37 @@ function draw() {
 
  // }
 
+
+ if (!postcardImage) {
+
+    push();
+
+    rectMode(CORNER);
+
+    drawingContext.setLineDash([18, 14]);
+    stroke(255);
+    strokeWeight(1);
+    noFill();
+
+    rect(cardX, cardY, cardW, cardH);
+
+    drawingContext.setLineDash([]);
+
+    fill(255);
+    noStroke();
+
+    textAlign(CENTER, CENTER);
+    textSize(22);
+
+    text(
+  'Click "+" to pull a new postcard from the void.\n\nReach into the void to see a well-traveled postcard.\nFlip it over to leave your mark.',
+  cardX + cardW / 2,
+  cardY + cardH - 100
+);
+
+    pop();
+}
+
  if (postcardImage) {
     flipButton.show();
     } else {
@@ -195,10 +246,43 @@ function draw() {
 
   let squeeze = abs(cos(radians(cardRotation)));
 
+  cardScale = 1;
+cardOffsetY = 0;
+
+if (cardAnim !== "none") {
+    let t = constrain((millis() - cardAnimStart) / cardAnimDuration, 0, 1);
+
+    if (cardAnim === "pull") {
+        let eased = easeOutCubic(t);
+        cardScale = lerp(0.05, 1, eased);
+        cardOffsetY = lerp(220, 0, eased);
+    }
+
+    if (cardAnim === "send") {
+        let eased = easeInCubic(t);
+        cardScale = lerp(1, 0.02, eased);
+        cardOffsetY = lerp(0, 220, eased);
+    }
+
+    if (t >= 1) {
+        if (cardAnim === "send") {
+            postcardImage = null;
+            postcardImageUrl = "";
+            postcardTitle = "";
+            doodleLayer.background(255);
+            flipped = false;
+            cardRotation = 0;
+            targetRotation = 0;
+        }
+
+        cardAnim = "none";
+    }
+}
+
 
 push();
-translate(cardX + cardW / 2, cardY + cardH / 2);
-scale(squeeze, 1);
+translate(cardX + cardW / 2, cardY + cardH / 2 + cardOffsetY);
+scale(squeeze * cardScale, cardScale);
 
 
 
@@ -225,7 +309,7 @@ scale(squeeze, 1);
             fill(0);
             noStroke();
             textSize(10);
-            text("Leave your mark. Or don't.", -cardW / 2 + 20, -cardH / 2 + 30);
+            text("Leave your mark?s", -cardW / 2 + 20, -cardH / 2 + 30);
 
             
         } else {
@@ -337,13 +421,7 @@ async function sendPostcard() {
 
     };
 
-    postcardImage = null;
-    postcardImageUrl = "";
-    postcardTitle = "";
-    doodleLayer.background(255);
-    flipped = false;
-    cardRotation = 0;
-    targetRotation = 0;
+        startCardAnimation("send");
 
 }
 
@@ -364,6 +442,7 @@ async function receivePostcard() {
             postcardImageUrl = pickedPostcard.imageUrl;
             loadImage(postcardImageUrl, img => {
             postcardImage = img;
+            startCardAnimation("pull");
             });
             doodleLayer.background(255);
 
